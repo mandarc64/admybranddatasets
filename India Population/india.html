@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Heatmaps</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+  </head>
+  <body>
+    <div id="floating-panel">
+      <button id="toggle-heatmap">Toggle Heatmap</button>
+      <button id="change-gradient">Change gradient</button>
+      <button id="change-radius">Change radius</button>
+      <button id="change-opacity">Change opacity</button>
+    </div>
+    <div id="map"></div>
+
+    <script>
+
+        var map, heatmap,file;
+        var center_lat = 9.9312;
+        var center_lng = 76.2673;
+
+        function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 13,
+            center: { lat: 19.0760, lng:72.8777  },
+            mapTypeId: "roadmap",
+        });
+        heatmap = new google.maps.visualization.HeatmapLayer({
+            data: getPoints(),
+            map: map,
+        });
+        document
+            .getElementById("toggle-heatmap")
+            .addEventListener("click", toggleHeatmap);
+        document
+            .getElementById("change-gradient")
+            .addEventListener("click", changeGradient);
+        document
+            .getElementById("change-opacity")
+            .addEventListener("click", changeOpacity);
+        document
+            .getElementById("change-radius")
+            .addEventListener("click", changeRadius);
+        }
+
+        function toggleHeatmap() {
+        heatmap.setMap(heatmap.getMap() ? null : map);
+        }
+
+        function changeGradient() {
+        const gradient = [
+            "rgba(0, 255, 255, 0)",
+            "rgba(0, 255, 255, 1)",
+            "rgba(0, 191, 255, 1)",
+            "rgba(0, 127, 255, 1)",
+            "rgba(0, 63, 255, 1)",
+            "rgba(0, 0, 255, 1)",
+            "rgba(0, 0, 223, 1)",
+            "rgba(0, 0, 191, 1)",
+            "rgba(0, 0, 159, 1)",
+            "rgba(0, 0, 127, 1)",
+            "rgba(63, 0, 91, 1)",
+            "rgba(127, 0, 63, 1)",
+            "rgba(191, 0, 31, 1)",
+            "rgba(255, 0, 0, 1)",
+        ];
+
+        heatmap.set("gradient", heatmap.get("gradient") ? null : gradient);
+        }
+
+        function changeRadius() {
+        heatmap.set("radius", heatmap.get("radius") ? null : 20);
+        }
+
+        function changeOpacity() {
+        heatmap.set("opacity", heatmap.get("opacity") ? null : 0.2);
+        }
+
+        function getPoints() {
+          
+        const loc = []
+
+        // files = ['ind_0_70.geojson','ind_0_80.geojson','ind_10_80.geojson','ind_20_90.geojson','ind_30_60.geojson','ind_30_70.geojson','ind_30_80.geojson']
+
+        // for (let j = 0; j < files.length; j++) 
+        // {
+        
+        if (center_lat >= 0 & center_lng <= 70) {
+         file = 'ind_0_70.geojson';
+        }
+        else if (center_lat >= 0 & center_lng <= 80) {
+          file = 'ind_0_80.geojson';
+        }
+        else if (center_lat >= 0 & center_lng <= 90) {
+          file = 'ind_0_90.geojson';
+        }  
+        else if (center_lat >= 10 & center_lng <= 70) {
+          file = 'ind_10_70.geojson';
+        }
+        else if (center_lat >= 10 & center_lng <= 80) {
+          file = 'ind_10_80.geojson';
+        }
+        else if (center_lat >= 10 & center_lng <= 90) {
+          file = 'ind_10_90.geojson';
+        }
+        else if (center_lat >= 20 & center_lng <= 60) {
+          file  = 'ind_20_60.geojson';
+        }
+        else if (center_lat >= 20 & center_lng <= 70) {
+          file  = 'ind_20_70.geojson';
+        }
+        else if (center_lat >= 20 & center_lng <= 80) {
+          file  = 'ind_20_80.geojson';
+        }
+        else if (center_lat >= 20 & center_lng <= 90) {
+          file  = 'ind_20_90.geojson';
+        }
+        else if (center_lat >= 30 & center_lng <= 60) {
+          file = 'ind_30_60.geojson'
+        }
+        else if (center_lat >= 30 & center_lng <= 70) {
+          file = 'ind_30_70.geojson'
+        }
+        else if (center_lat >= 30 & center_lng <= 80) {
+          file = 'ind_30_80.geojson'
+        }
+        else {
+          alert('Heatmap not available for this location')
+        }
+       
+        fetch('https://cdn.admybrand.com/assets/'+file)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(myJson) {
+           
+            var coordinates = myJson['coordinates'];
+          
+            for (var i = 0; i < coordinates.length; i++) {
+               
+
+                  let c = Math.sqrt(Math.pow((center_lat - coordinates[i][1]),2) + Math.pow((center_lng - coordinates[i][0]),2));
+              
+                  if (c <= 0.05) {
+                  
+                    loc.push(new google.maps.LatLng(coordinates[i][1], coordinates[i][0]));
+                  }
+
+                
+            }
+        })
+   
+        return loc;
+        
+      }
+
+
+    </script>
+
+     <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHwKRO1oo4iiA5SssRsvWefak4azsMLlI&callback=initMap&libraries=visualization&v=weekly"
+      async
+    ></script>
+ 
+  </body>
+</html>
+
+
+
+

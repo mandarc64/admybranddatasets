@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Heatmaps</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+  </head>
+  <body>
+    <div id="floating-panel">
+      <button id="toggle-heatmap">Toggle Heatmap</button>
+      <button id="change-gradient">Change gradient</button>
+      <button id="change-radius">Change radius</button>
+      <button id="change-opacity">Change opacity</button>
+    </div>
+    <div id="map"></div>
+
+    <script>
+
+        var map, heatmap;
+        var center_lat = 40.76680555555556;
+        var center_lng = -82.07375;
+
+        function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 13,
+            center: { lat: 42.81, lng:-84.544 },
+            mapTypeId: "roadmap",
+        });
+        heatmap = new google.maps.visualization.HeatmapLayer({
+            data: getPoints(),
+            map: map,
+        });
+        document
+            .getElementById("toggle-heatmap")
+            .addEventListener("click", toggleHeatmap);
+        document
+            .getElementById("change-gradient")
+            .addEventListener("click", changeGradient);
+        document
+            .getElementById("change-opacity")
+            .addEventListener("click", changeOpacity);
+        document
+            .getElementById("change-radius")
+            .addEventListener("click", changeRadius);
+        }
+
+        function toggleHeatmap() {
+        heatmap.setMap(heatmap.getMap() ? null : map);
+        }
+
+        function changeGradient() {
+        const gradient = [
+            "rgba(0, 255, 255, 0)",
+            "rgba(0, 255, 255, 1)",
+            "rgba(0, 191, 255, 1)",
+            "rgba(0, 127, 255, 1)",
+            "rgba(0, 63, 255, 1)",
+            "rgba(0, 0, 255, 1)",
+            "rgba(0, 0, 223, 1)",
+            "rgba(0, 0, 191, 1)",
+            "rgba(0, 0, 159, 1)",
+            "rgba(0, 0, 127, 1)",
+            "rgba(63, 0, 91, 1)",
+            "rgba(127, 0, 63, 1)",
+            "rgba(191, 0, 31, 1)",
+            "rgba(255, 0, 0, 1)",
+        ];
+
+        heatmap.set("gradient", heatmap.get("gradient") ? null : gradient);
+        }
+
+        function changeRadius() {
+        heatmap.set("radius", heatmap.get("radius") ? null : 20);
+        }
+
+        function changeOpacity() {
+        heatmap.set("opacity", heatmap.get("opacity") ? null : 0.2);
+        }
+
+        function getPoints() {
+          
+        const loc = []
+        
+        files = ['merged_usa_part1&2&3.json','merged_usa_part4.json','merged_usa_part5.json','merged_usa_part6.json']
+
+       
+        for (let j = 0; j < 4; j++) 
+        {
+  
+        fetch('https://cdn.admybrand.com/assets/merged_usa_part1&2&3.json')
+        .then(response => response.json())
+      
+        .then(data => {
+          
+            for (let i = 0; i < data.length; i++)
+            {
+              let lat = parseFloat(data[i]['Lat']);
+
+              
+              let lon = parseFloat(data[i]['Lon']);
+            
+              let c = Math.sqrt(Math.pow((center_lat - lat),2) + Math.pow((center_lng - lon),2));
+
+              
+              if (c <= 50) {
+                let lat2 = parseFloat(data[i]['Lat']);
+                let lon2 = parseFloat(data[i]['Lon']);
+              
+                    loc.push(new google.maps.LatLng(lat2,lon2));
+              }
+              
+            }
+        })
+        .catch(error => console.log(error))
+        
+  
+        
+        
+      }
+      return loc;
+        
+      }
+
+
+    </script>
+
+    // <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHwKRO1oo4iiA5SssRsvWefak4azsMLlI&callback=initMap&libraries=visualization&v=weekly"
+      async
+    ></script>
+ 
+  </body>
+</html>
+
+
+
+
+
+
